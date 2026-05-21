@@ -258,9 +258,14 @@ ${item.image_url ? `<img src="${item.image_url}" id="img_${item.id}">` : ""}
     id="comment_${item.id}"
   >${item.comment || ""}</textarea>
 
-<div class="price">
-  ${item.unit || ""}
-</div>
+<label>販売単位</label>
+
+<input
+  class="edit-input"
+  id="unit_${item.id}"
+  value="${item.unit || ""}"
+  placeholder="例：袋、kg、箱、束"
+>
 
 <!-- 投稿日時 -->
 <div class="upload-time">
@@ -332,6 +337,11 @@ ${item.image_url ? `<img src="${item.image_url}" id="img_${item.id}">` : ""}
                     .value
                     .trim();
 
+            const unit =
+                document.getElementById(`unit_${id}`)
+                    .value
+                    .trim();
+
             // 入力チェック
             if (!vegetable_name) {
                 alert("野菜名を入力してください");
@@ -349,7 +359,8 @@ ${item.image_url ? `<img src="${item.image_url}" id="img_${item.id}">` : ""}
                 .update({
                     vegetable_name: vegetable_name,
                     price: priceNumber,
-                    comment: comment
+                    comment: comment,
+                    unit: unit
                 })
                 .eq("id", id);
 
