@@ -96,7 +96,19 @@
 
         #historyBtn {
             background: #006636;
-            margin-bottom: 18px;
+
+            position: fixed;
+            top: 12px;
+            right: 12px;
+
+            width: auto;
+            padding: 12px 18px;
+
+            z-index: 9999;
+
+            margin-bottom: 0;
+
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
         }
 
         .card button {
@@ -403,7 +415,9 @@
             }
 
             const buyerName = document.getElementById("buyer_name").value;
-            const qty = document.getElementById(`qty_${vegetableId}`).value;
+            const qty = Number(
+                document.getElementById(`qty_${vegetableId}`).value
+            );
 
             if (!buyerName) {
                 alert("購入者名（事業者名）を入力してください");
