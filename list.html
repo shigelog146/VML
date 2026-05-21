@@ -137,6 +137,35 @@
             margin-top: 8px;
             margin-bottom: 10px;
         }
+
+        /* =========================
+   戻るボタン固定
+========================= */
+        #backBtn {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+
+            width: auto;
+            padding: 12px 18px;
+
+            background: #2d5a75;
+            color: white;
+
+            border: none;
+            border-radius: 8px;
+
+            z-index: 9999;
+
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+
+            margin: 0;
+        }
+
+        /* ボタンに隠れないよう上余白追加 */
+        body {
+            padding-top: 80px;
+        }
     </style>
 
 </head>
@@ -146,7 +175,7 @@
     <!-- ================================
        index.htmlへ戻るボタン
        ================================ -->
-    <button onclick="location.href='index.html'" style="margin-bottom:12px; background:#2d5a75;">
+    <button id="backBtn" onclick="location.href='index.html'">
         ← 登録画面へ戻る
     </button>
 
