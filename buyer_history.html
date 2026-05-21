@@ -289,7 +289,10 @@
           <div><strong>野菜名：</strong>${p.vegetables.vegetable_name}</div>
           <div><strong>農家：</strong>${p.vegetables.farm_name}</div>
           <div><strong>数量：</strong>${p.quantity} ${p.vegetables.unit}</div>
-          <div><strong>単価：</strong>${p.vegetables.price}円</div>
+<div>
+  <strong>単価：</strong>
+  ${p.vegetables.price}円 / ${p.vegetables.unit}
+</div>
           <div><strong>合計：</strong>${p.quantity * p.vegetables.price}円</div>
           
 ${p.is_received
