@@ -16,6 +16,9 @@
       font-family: sans-serif;
       padding: 18px;
       background-color: #e4e3e3;
+
+      /* 固定ボタン分 */
+      padding-top: 90px;
     }
 
     h1 {
@@ -91,6 +94,26 @@
         font-size: 24px;
       }
     }
+
+    #listBtn {
+
+      position: fixed;
+
+      top: 12px;
+      right: 12px;
+
+      z-index: 9999;
+
+      width: auto;
+
+      padding: 12px 18px;
+
+      margin: 0;
+
+      background: #2d5a75;
+
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    }
   </style>
 
   <!-- Leaflet -->
@@ -142,9 +165,11 @@
   <div id="appArea" class="locked">
 
     <div id="farmer-actions" style="display:none;">
-      <button onclick="location.href='list.html'">
+
+      <button id="listBtn" onclick="location.href='list.html'">
         販売一覧を見る
       </button>
+
     </div>
 
     <h1>本日の野菜を登録</h1>
