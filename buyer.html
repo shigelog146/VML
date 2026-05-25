@@ -190,7 +190,7 @@
         <h3 id="authTitle"><img src="icon/icons8-beet-50.png" class="heading-icon">VEGGIE MARKET LAB 🌿</h3>
 
         <input id="email" type="email" placeholder="メールアドレス">
-
+        <input id="company_name" placeholder="事業者名・店舗名">
         <div style="
   position:relative;
   width:100%;
@@ -308,7 +308,7 @@
                 return;
             }
 
-            setLogin(user);
+            await setLogin(user);
         });
 
         /* =========================
@@ -472,8 +472,14 @@
         ========================== */
         async function login() {
 
-            const email = document.getElementById("email").value.trim();
-            const password = document.getElementById("password").value.trim();
+            const email =
+                document.getElementById("email").value.trim();
+
+            const password =
+                document.getElementById("password").value.trim();
+
+            const companyName =
+                document.getElementById("company_name").value.trim();
 
             if (!email || !password) {
                 alert("メールアドレスとパスワードを入力してください");
@@ -526,7 +532,7 @@
             }
 
             // ここまで通ったら初めてログイン確定
-            setLogin(user);
+            await setLogin(user);
             alert("ログイン成功");
         }
 
@@ -535,11 +541,20 @@
         ========================== */
         async function signup() {
 
-            const email = document.getElementById("email").value.trim();
-            const password = document.getElementById("password").value.trim();
+            const email =
+                document.getElementById("email").value.trim();
 
-            if (!email || !password) {
-                alert("メールアドレスとパスワードを入力してください");
+            const password =
+                document.getElementById("password").value.trim();
+
+            // 追加
+            const companyName =
+                document.getElementById("company_name").value.trim();
+
+            if (!email || !password || !companyName) {
+
+                alert("メールアドレス・パスワード・事業者名を入力してください");
+
                 return;
             }
 
@@ -560,7 +575,7 @@
                         id: data.user.id,
                         role: "buyer",
                         approved: false,
-                        name: "",
+                        name: companyName,
                         address: "",
                         phone: ""
                     });
@@ -586,11 +601,12 @@
         /* =========================
            ログイン状態UI切替
         ========================== */
-        function setLogin(user) {
+        async function setLogin(user) {
 
             currentUser = user;
 
             document.getElementById("loginStatus").style.display = "block";
+
             document.getElementById("loginUser").textContent =
                 `ログイン中：${user.email}`;
 
@@ -599,13 +615,39 @@
 
             document.getElementById("togglePassword")
                 .style.display = "none";
+
             document.getElementById("loginBtn").style.display = "none";
+
             document.getElementById("signupBtn").style.display = "none";
 
-            const buyerInput = document.getElementById("buyer_name");
+            // =========================
+            // profiles から事業者名取得
+            // =========================
+            const { data: profile, error } = await supabase
+                .from("profiles")
+                .select("name")
+                .eq("id", user.id)
+                .single();
+
+            const buyerInput =
+                document.getElementById("buyer_name");
+
             if (buyerInput) {
-                buyerInput.value = user.email;
-                // readOnly は付けない（編集可能にするため）
+
+                // name が登録されていれば自動入力
+                if (profile && profile.name) {
+
+                    buyerInput.value = profile.name;
+
+                } else {
+
+                    // name未登録時はメール表示
+                    buyerInput.value = user.email;
+
+                }
+
+                // 編集可能
+                buyerInput.readOnly = false;
             }
 
             loadVegetables();
