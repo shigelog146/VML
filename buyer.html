@@ -318,12 +318,7 @@
 
             const { data, error } = await supabase
                 .from("vegetables")
-                .select(`
-        *,
-        profiles (
-            name
-        )
-    `)
+                .select("*")
                 .eq("is_available", true)
                 .order("created_at", { ascending: false });
 
@@ -357,7 +352,7 @@
   color:#444;
   font-weight:bold;
 ">
-  👨‍🌾 ${v.farmer_name || "農家名未設定"}
+  👨‍🌾 ${v.farm_name || "農家名未設定"}
 </div>
 
           <button onclick="window.open('${mapUrl}', '_blank')">
