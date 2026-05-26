@@ -190,7 +190,7 @@
         <h3 id="authTitle"><img src="icon/icons8-beet-50.png" class="heading-icon">VEGGIE MARKET LAB 🌿</h3>
 
         <input id="email" type="email" placeholder="メールアドレス">
-        <input id="company_name" placeholder="事業者名・店舗名">
+
         <div style="
   position:relative;
   width:100%;
@@ -234,7 +234,7 @@
     <h1>本日の野菜</h1>
 
     <!-- 購入者名入力 -->
-    <label>購入者名</label>
+    <label>事業者名・店舗名</label>
     <input id="buyer_name" placeholder="例：山田青果店">
 
     <!-- 購入履歴ページへ移動ボタン -->
@@ -478,9 +478,6 @@
             const password =
                 document.getElementById("password").value.trim();
 
-            const companyName =
-                document.getElementById("company_name").value.trim();
-
             if (!email || !password) {
                 alert("メールアドレスとパスワードを入力してください");
                 return;
@@ -575,7 +572,7 @@
                         id: data.user.id,
                         role: "buyer",
                         approved: false,
-                        name: companyName,
+                        name: buyerName,
                         address: "",
                         phone: ""
                     });
