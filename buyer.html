@@ -346,6 +346,15 @@
           <div class="name">${v.vegetable_name}</div>
           <div>${v.farm_name}</div>
 
+<div style="
+  margin-top:6px;
+  font-size:16px;
+  color:#444;
+  font-weight:bold;
+">
+  👨‍🌾 ${v.farmer_name || "農家名未設定"}
+</div>
+
           <button onclick="window.open('${mapUrl}', '_blank')">
             <i data-lucide="carrot"></i> 畑の場所
           </button>
@@ -546,7 +555,7 @@
 
             // 追加
             const companyName =
-                document.getElementById("company_name").value.trim();
+                document.getElementById("buyer_name").value.trim();
 
             if (!email || !password || !companyName) {
 
@@ -572,7 +581,7 @@
                         id: data.user.id,
                         role: "buyer",
                         approved: false,
-                        name: buyerName,
+                        name: companyName,
                         address: "",
                         phone: ""
                     });

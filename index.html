@@ -673,7 +673,7 @@
 
       const { data: profile } = await supabase
         .from("profiles")
-        .select("approved")
+        .select("approved, name")
         .eq("id", user.id)
         .single();
 
@@ -758,6 +758,11 @@
 
               // ↓ 追加
               comment: comment,
+
+              comment: comment,
+
+              // 農家名保存
+              farmer_name: profile.name,
 
               image_url: urlData.publicUrl,
               is_available: true
