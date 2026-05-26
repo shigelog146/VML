@@ -318,7 +318,12 @@
 
             const { data, error } = await supabase
                 .from("vegetables")
-                .select("*")
+                .select(`
+        *,
+        profiles (
+            name
+        )
+    `)
                 .eq("is_available", true)
                 .order("created_at", { ascending: false });
 
