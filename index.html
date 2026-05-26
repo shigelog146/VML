@@ -424,13 +424,25 @@
       document.getElementById("register-area")
         .style.display = "none";
 
-      // 農家名を消す
+      // 農家名表示を消す
       document.getElementById("farmerNameView")
         .textContent = "";
 
-      // 入力欄を再表示
-      document.getElementById("farmer_name")
-        .style.display = "block";
+      // =========================
+      // farmer_name入力欄リセット
+      // =========================
+      const farmerInput =
+        document.getElementById("farmer_name");
+
+      farmerInput.value = "";          // ← 中身を消す
+      farmerInput.readOnly = false;    // ← 編集可能へ戻す
+      farmerInput.style.display = "block";
+
+      // emailも消す（おすすめ）
+      document.getElementById("email").value = "";
+
+      // passwordも消す（おすすめ）
+      document.getElementById("password").value = "";
     });
 
     /* =============================
