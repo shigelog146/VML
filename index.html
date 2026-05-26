@@ -129,6 +129,7 @@
        ============================= -->
   <div id="loginPanel">
     <input id="email" type="email" placeholder="メール">
+    <input id="farmer_name" placeholder="農家名・屋号">
     <div style="position:relative; max-width:500px;">
 
       <input id="password" type="password" placeholder="パスワード" style="padding-right:60px;">
@@ -157,6 +158,7 @@
     <button id="logoutBtn" class="hidden">ログアウト</button>
 
     <span id="loginStatus"></span>
+    <div id="farmerNameView"></div>
   </div>
 
   <!-- =============================
@@ -295,8 +297,11 @@
        ============================= */
     loginBtn.addEventListener("click", async () => {
 
-      const emailValue = document.getElementById("email").value;
-      const passwordValue = document.getElementById("password").value;
+      const emailValue =
+        document.getElementById("email").value;
+
+      const passwordValue =
+        document.getElementById("password").value;
 
       const { data, error } =
         await supabase.auth.signInWithPassword({
@@ -317,9 +322,25 @@
        ============================= */
     signupBtn.addEventListener("click", async () => {
 
-      const emailValue = document.getElementById("email").value;
-      const passwordValue = document.getElementById("password").value;
+      const emailValue =
+        document.getElementById("email").value;
 
+      const passwordValue =
+        document.getElementById("password").value;
+
+      const farmerName =
+        document.getElementById("farmer_name").value;
+
+      if (!emailValue || !passwordValue || !farmerName) {
+
+        alert("メール・パスワード・農家名を入力してください");
+
+        return;
+      }
+
+      // =========================
+      // auth登録
+      // =========================
       const { data, error } =
         await supabase.auth.signUp({
           email: emailValue,
@@ -331,20 +352,80 @@
         return;
       }
 
+      // =========================
+      // profiles作成
+      // =========================
+      if (data.user) {
+
+        // =========================
+        // 既存profiles確認
+        // =========================
+        const { data: existingProfile } =
+          await supabase
+            .from("profiles")
+            .select("id")
+            .eq("id", data.user.id)
+            .maybeSingle();
+
+        // 既に存在しない場合のみ作成
+        if (!existingProfile) {
+
+          const { error: profileError } =
+            await supabase
+              .from("profiles")
+              .insert([
+                {
+                  id: data.user.id,
+                  name: farmerName,
+                  role: "farmer",
+                  approved: false
+                }
+              ]);
+
+          if (profileError) {
+
+            console.error(profileError);
+
+            alert("プロフィール保存失敗");
+
+            return;
+          }
+        }
+      }
+
       loginStatus.textContent =
-        "確認メールを送信しました。メールを確認してください。";
+        "確認メールを送信しました。";
     });
 
     /* =============================
        ログアウト
        ============================= */
     logoutBtn.addEventListener("click", async () => {
+
       await supabase.auth.signOut();
+
       currentUser = null;
+
       appArea.classList.add("locked");
+
       logoutBtn.classList.add("hidden");
+
       loginStatus.textContent = "";
-      document.getElementById("userEmail").textContent = "";
+
+      // ボタン非表示
+      document.getElementById("farmer-actions")
+        .style.display = "none";
+
+      document.getElementById("register-area")
+        .style.display = "none";
+
+      // 農家名を消す
+      document.getElementById("farmerNameView")
+        .textContent = "";
+
+      // 入力欄を再表示
+      document.getElementById("farmer_name")
+        .style.display = "block";
     });
 
     /* =============================
@@ -355,38 +436,35 @@
       currentUser = user;
 
       logoutBtn.classList.remove("hidden");
-      loginStatus.textContent = `ログイン中：${user.email}`;
 
+      document.getElementById("farmer_name")
+        .style.display = "none";
+
+      loginStatus.textContent =
+        `ログイン中：${user.email}`;
+
+      // =========================
       // profiles確認
+      // =========================
       const { data: profile, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select("name, role, approved")
         .eq("id", user.id)
         .single();
 
-      // 初回ログイン → profiles作成
       if (error || !profile) {
 
-        const { error: insertError } = await supabase
-          .from("profiles")
-          .insert([
-            {
-              id: user.id,
-              role: "farmer",
-              approved: false
-            }
-          ]);
+        alert("プロフィール取得失敗");
 
-        if (insertError) {
-          console.error("profiles作成失敗:", insertError);
-          alert("プロフィール作成エラー");
-          return;
-        }
-
-        alert("管理者の承認後に利用可能です");
-        appArea.classList.add("locked");
         return;
       }
+
+      // =========================
+      // 農家名表示
+      // =========================
+      document.getElementById("farmerNameView")
+        .textContent = `農家名：${profile.name}`;
+
 
       // 🔴 roleチェック
       if (profile.role !== "farmer") {
