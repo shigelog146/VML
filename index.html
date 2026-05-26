@@ -42,6 +42,11 @@
       box-sizing: border-box;
     }
 
+    input[readonly] {
+      background: #eee;
+      color: #555;
+    }
+
     button {
       max-width: 6cm;
       font-size: 22px;
@@ -438,7 +443,7 @@
       logoutBtn.classList.remove("hidden");
 
       document.getElementById("farmer_name")
-        .style.display = "none";
+        .readOnly = true;
 
       loginStatus.textContent =
         `ログイン中：${user.email}`;
@@ -464,7 +469,15 @@
       // =========================
       document.getElementById("farmerNameView")
         .textContent = `農家名：${profile.name}`;
+      // 農家名表示
+      document.getElementById("farmerNameView")
+        .textContent = `農家名：${profile.name}`;
 
+      // =========================
+      // inputにも自動反映
+      // =========================
+      document.getElementById("farmer_name").value =
+        profile.name;
 
       // 🔴 roleチェック
       if (profile.role !== "farmer") {
