@@ -22,6 +22,8 @@
             /* 基本文字サイズ */
             padding: 14px;
             /* 内側余白 */
+            /* 固定ボタン分の余白 */
+            padding-top: 90px;
             background: #e1dbdb;
             /* 背景色 */
         }
@@ -109,8 +111,22 @@
     <!-- =============================
        購入画面に戻るボタン
   ============================== -->
-    <button id="backBtn"
-        style="font-size: 20px; padding:10px 20px; background:#007700; color:#fff; border:none; border-radius:6px; cursor:pointer; margin-bottom:16px;">
+    <button id="backBtn" style="
+    position:fixed;
+    top:14px;
+    left:14px;
+    z-index:9999;
+
+    font-size:20px;
+    padding:12px 20px;
+    background:#007700;
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+
+    box-shadow:0 4px 10px rgba(0,0,0,0.25);
+    ">
         購入画面に戻る
     </button>
 
