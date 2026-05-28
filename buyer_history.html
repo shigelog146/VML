@@ -265,7 +265,7 @@
           vegetables (
             id,
             vegetable_name,
-            farm_name,
+            farmer_name,
             unit,
             price,
             image_url,
@@ -303,7 +303,7 @@
           <img src="${p.vegetables.image_url}" class="history-photo">
           <div><strong>購入日時：</strong>${new Date(p.purchased_at).toLocaleString()}</div>
           <div><strong>野菜名：</strong>${p.vegetables.vegetable_name}</div>
-          <div><strong>農家：</strong>${p.vegetables.farm_name}</div>
+          <div><strong>農家：</strong>${p.vegetables.farmer_name}</div>
           <div><strong>数量：</strong>${p.quantity} ${p.vegetables.unit}</div>
 <div>
   <strong>単価：</strong>
