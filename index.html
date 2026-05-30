@@ -172,6 +172,21 @@
   <div id="appArea" class="locked">
 
     <div id="farmer-actions" style="display:none;">
+      <!-- =========================
+     注文通知
+========================= -->
+      <div id="orderNotification" style="
+  background:#fff3cd;
+  color:#856404;
+  padding:16px;
+  border-radius:8px;
+  margin-bottom:20px;
+  display:none;
+  font-weight:bold;
+  border:2px solid #ffeeba;
+">
+        新しい注文があります
+      </div>
 
       <button id="listBtn" onclick="location.href='list.html'">
         販売一覧を見る
@@ -519,6 +534,8 @@
 
       document.getElementById("register-area")
         .style.display = "block";
+      // リアルタイム通知開始
+      startPurchaseRealtime();
     }
 
     // ===============================
@@ -816,6 +833,96 @@
 
     });
 
+    /* =============================
+   購入通知リアルタイム
+============================= */
+    function startPurchaseRealtime() {
+
+      if (!currentUser) return;
+
+      supabase
+        .channel("purchase-notification")
+
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "purchases"
+          },
+
+          async (payload) => {
+
+            console.log("購入通知:", payload);
+
+            const purchase = payload.new;
+
+            // 自分の商品だけ通知
+            if (purchase.farmer_id !== currentUser.id) {
+              return;
+            }
+
+            const notification =
+              document.getElementById("orderNotification");
+
+            notification.style.display = "block";
+
+            // =========================
+            // 野菜情報取得
+            // =========================
+            const { data: vegetableData } =
+              await supabase
+                .from("vegetables")
+                .select("vegetable_name, price")
+                .eq("id", purchase.vegetable_id)
+                .single();
+
+            // 合計金額計算
+            const totalPrice =
+              (vegetableData?.price || 0)
+              * purchase.quantity;
+
+            // 通知表示
+            notification.innerHTML = `
+  🥬 商品が購入されました<br><br>
+
+  商品：${vegetableData?.vegetable_name || "不明"}<br>
+  数量：${purchase.quantity}<br>
+  合計：${totalPrice}円<br>
+  購入者：${purchase.buyer_name}
+`;
+
+            // 通知音
+            const audio = new Audio(
+              "https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"
+            );
+
+            audio.play();
+
+            // ブラウザ通知
+            if (Notification.permission === "granted") {
+
+              new Notification("新しい注文", {
+                body:
+                  `${purchase.vegetable_name} が購入されました`
+              });
+
+            }
+
+          }
+        )
+
+        .subscribe();
+    }
+
+    /* =============================
+       ブラウザ通知許可
+    ============================= */
+    if ("Notification" in window) {
+
+      Notification.requestPermission();
+
+    }
   </script>
 
 </body>

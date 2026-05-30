@@ -437,15 +437,49 @@
                 alert("数量を正しく入力してください");
                 return;
             }
+            // =========================
+            // 野菜詳細取得
+            // =========================
+            const { data: vegetable, error: vegError } =
+                await supabase
+                    .from("vegetables")
+                    .select("*")
+                    .eq("id", vegetableId)
+                    .single();
 
+            if (vegError || !vegetable) {
+
+                console.error(vegError);
+
+                alert("野菜情報取得失敗");
+
+                return;
+            }
             /* purchasesテーブルへ保存 */
             const { error } = await supabase
                 .from("purchases")
                 .insert({
+
                     vegetable_id: vegetableId,
+
+                    vegetable_name:
+                        vegetable.vegetable_name,
+
+                    price:
+                        vegetable.price,
+
+                    total_price:
+                        vegetable.price * qty,
+
                     buyer_id: user.id,
+
                     buyer_name: buyerName,
+
                     farmer_id: farmerId,
+
+                    farmer_name:
+                        vegetable.farmer_name,
+
                     quantity: qty
                 });
 
