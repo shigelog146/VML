@@ -212,6 +212,23 @@
         ============================= */
         window.cancelPurchase = async function (purchaseId, vegetableId) {
 
+            // =========================
+            // 購入情報取得
+            // =========================
+            const { data: purchaseData } = await supabase
+                .from("purchases")
+                .select("is_received")
+                .eq("id", purchaseId)
+                .single();
+
+            // =========================
+            // 受取済ならキャンセル禁止
+            // =========================
+            if (purchaseData?.is_received) {
+                alert("受取済の商品はキャンセルできません");
+                return;
+            }
+
             const confirmCancel = confirm("この購入をキャンセルしますか？");
             if (!confirmCancel) return;
 
