@@ -190,11 +190,19 @@
         /* =============================
            購入済処理
         ============================== */
+        /* =============================
+           購入済処理
+        ============================= */
         window.markReceived = async function (id) {
 
             const { error } = await supabase
                 .from("purchases")
-                .update({ is_received: true })
+                .update({
+                    is_received: true,
+
+                    // 受取日時保存
+                    received_at: new Date().toISOString()
+                })
                 .eq("id", id);
 
             if (error) {
@@ -204,6 +212,7 @@
             }
 
             alert("受取完了にしました");
+
             loadHistory(); // 再読み込み
         };
 

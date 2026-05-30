@@ -801,8 +801,6 @@
               // ↓ 追加
               comment: comment,
 
-              comment: comment,
-
               // 農家名保存
               farmer_name: profile.name,
 
@@ -856,7 +854,52 @@
             console.log("購入通知:", payload);
 
             const purchase = payload.new;
+            // =========================
+            // 購入済通知
+            // =========================
+            if (
+              payload.eventType === "UPDATE"
+              && purchase.is_received === true
+            ) {
 
+              // 自分の商品だけ
+              if (purchase.farmer_id !== currentUser.id) {
+                return;
+              }
+
+              const notification =
+                document.getElementById("orderNotification");
+
+              notification.style.display = "block";
+
+              notification.innerHTML = `
+    ✅ 商品が受け取られました<br><br>
+
+    商品：${purchase.vegetable_name}<br>
+    数量：${purchase.quantity}<br>
+    合計：${purchase.total_price}円<br>
+    購入者：${purchase.buyer_name}
+  `;
+
+              // 通知音
+              const audio = new Audio(
+                "https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"
+              );
+
+              audio.play();
+
+              // ブラウザ通知
+              if (Notification.permission === "granted") {
+
+                new Notification("商品受取通知", {
+                  body:
+                    `${purchase.vegetable_name} が受取完了になりました`
+                });
+
+              }
+
+              return;
+            }
             // =========================
             // キャンセル通知
             // =========================
@@ -907,7 +950,7 @@
 
             // 通知表示
             notification.innerHTML = `
-  🥬 商品が購入されました<br><br>
+  🥬 商品が予約されました<br><br>
 
   商品：${vegetableData?.vegetable_name || "不明"}<br>
   数量：${purchase.quantity}<br>
