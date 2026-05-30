@@ -846,7 +846,7 @@
         .on(
           "postgres_changes",
           {
-            event: "INSERT",
+            event: "*",
             schema: "public",
             table: "purchases"
           },
@@ -856,6 +856,29 @@
             console.log("購入通知:", payload);
 
             const purchase = payload.new;
+
+            // =========================
+            // キャンセル通知
+            // =========================
+            if (payload.eventType === "UPDATE"
+              && purchase.is_canceled === true) {
+
+              // 自分の商品だけ
+              if (purchase.farmer_id !== currentUser.id) {
+                return;
+              }
+
+              const notification =
+                document.getElementById("orderNotification");
+
+              notification.style.display = "block";
+
+              notification.innerHTML = `
+    ❌ 注文がキャンセルされました
+  `;
+
+              return;
+            }
 
             // 自分の商品だけ通知
             if (purchase.farmer_id !== currentUser.id) {

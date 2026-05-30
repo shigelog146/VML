@@ -216,11 +216,13 @@
             if (!confirmCancel) return;
 
             // ============================
-            // ① purchases を完全削除（履歴から消す）
+            // ① キャンセル状態へ変更
             // ============================
             const { error: purchaseError } = await supabase
                 .from("purchases")
-                .delete()
+                .update({
+                    is_canceled: true
+                })
                 .eq("id", purchaseId);
 
             if (purchaseError) {
@@ -258,11 +260,12 @@
             const { data, error } = await supabase
                 .from("purchases")
                 .select(`
-          id,
-          quantity,
-          purchased_at,
-          is_received,
-          vegetables (
+id,
+quantity,
+purchased_at,
+is_received,
+is_canceled,
+vegetables (
             id,
             vegetable_name,
             farmer_name,
@@ -311,9 +314,9 @@
 </div>
           <div><strong>合計：</strong>${p.quantity * p.vegetables.price}円</div>
           
-${p.is_received
+${p.is_canceled
                         ? `<div style="display:flex;gap:10px;align-items:center;">
-       <div style="color:green;font-weight:bold;">受取済</div>
+<div style="color:red;font-weight:bold;">キャンセル済</div>
      </div>`
                         : `<div style="display:flex;gap:8px;flex-wrap:wrap;">
        <button onclick="markReceived('${p.id}')"
