@@ -338,20 +338,30 @@ vegetables (
 </div>
           <div><strong>合計：</strong>${p.quantity * p.vegetables.price}円</div>
           
-${p.is_canceled
-                        ? `<div style="display:flex;gap:10px;align-items:center;">
-<div style="color:red;font-weight:bold;">キャンセル済</div>
-     </div>`
-                        : `<div style="display:flex;gap:8px;flex-wrap:wrap;">
-       <button onclick="markReceived('${p.id}')"
-               style="background:#007700;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;">
-         購入済にする
-       </button>
-       <button onclick="cancelPurchase('${p.id}', '${p.vegetables.id}')"
-               style="background:#cc0000;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;">
-         キャンセル
-       </button>
-     </div>`
+${p.is_received
+                        ? `<div style="color:green;font-weight:bold;">
+         受取済
+       </div>`
+
+                        : p.is_canceled
+
+                            ? `<div style="color:red;font-weight:bold;">
+         キャンセル済
+       </div>`
+
+                            : `<div style="display:flex;gap:8px;flex-wrap:wrap;">
+
+         <button onclick="markReceived('${p.id}')"
+             style="background:#007700;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;">
+           購入済にする
+         </button>
+
+         <button onclick="cancelPurchase('${p.id}', '${p.vegetables.id}')"
+             style="background:#cc0000;color:#fff;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;">
+           キャンセル
+         </button>
+
+       </div>`
                     }
 
           <button onclick="openMap(${p.vegetables.latitude}, ${p.vegetables.longitude})">
