@@ -903,8 +903,10 @@
             // =========================
             // キャンセル通知
             // =========================
-            if (payload.eventType === "UPDATE"
-              && purchase.is_canceled === true) {
+            if (
+              payload.eventType === "UPDATE"
+              && purchase.is_canceled === true
+            ) {
 
               // 自分の商品だけ
               if (purchase.farmer_id !== currentUser.id) {
@@ -919,6 +921,28 @@
               notification.innerHTML = `
     ❌ 注文がキャンセルされました
   `;
+
+              // =========================
+              // 通知音（鈴）
+              // =========================
+              const audio = new Audio(
+                "https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"
+              );
+
+              audio.volume = 0.5;
+
+              audio.play();
+
+              // =========================
+              // ブラウザ通知
+              // =========================
+              if (Notification.permission === "granted") {
+
+                new Notification("キャンセル通知", {
+                  body: "注文がキャンセルされました"
+                });
+
+              }
 
               return;
             }
