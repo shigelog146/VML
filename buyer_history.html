@@ -321,6 +321,9 @@ vegetables (
                 return;
             }
 
+            /* 実際に表示した件数 */
+            let visibleCount = 0;
+
             /* 1件ずつカード生成 */
             data.forEach(p => {
 
@@ -379,7 +382,26 @@ ${p.is_received
         `;
 
                 historyList.appendChild(div);
+
+                /* 表示件数を増やす */
+                visibleCount++;
             });
+            // =========================
+            // 表示対象が0件
+            // =========================
+            if (visibleCount === 0) {
+
+                historyList.innerHTML = `
+        <div style="
+            background:#fff;
+            padding:20px;
+            border-radius:10px;
+            font-size:22px;
+        ">
+            表示できる購入履歴はありません
+        </div>
+    `;
+            }
         }
 
     </script>
