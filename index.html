@@ -860,6 +860,7 @@
             if (
               payload.eventType === "UPDATE"
               && purchase.is_received === true
+              && purchase.is_canceled !== true
             ) {
 
               // 自分の商品だけ
@@ -906,6 +907,7 @@
             if (
               payload.eventType === "UPDATE"
               && purchase.is_canceled === true
+              && purchase.is_received !== true
             ) {
 
               // 自分の商品だけ
