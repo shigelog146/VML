@@ -860,7 +860,6 @@
             if (
               payload.eventType === "UPDATE"
               && purchase.is_received === true
-              && purchase.is_canceled !== true
             ) {
 
               // 自分の商品だけ
@@ -887,7 +886,9 @@
                 "https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"
               );
 
-              audio.play();
+              audio.play().catch(err => {
+                console.log("音再生失敗", err);
+              });
 
               // ブラウザ通知
               if (Notification.permission === "granted") {
@@ -907,7 +908,6 @@
             if (
               payload.eventType === "UPDATE"
               && purchase.is_canceled === true
-              && purchase.is_received !== true
             ) {
 
               // 自分の商品だけ
@@ -933,7 +933,9 @@
 
               audio.volume = 0.5;
 
-              audio.play();
+              audio.play().catch(err => {
+                console.log("音再生失敗", err);
+              });
 
               // =========================
               // ブラウザ通知
@@ -989,7 +991,9 @@
               "https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"
             );
 
-            audio.play();
+            audio.play().catch(err => {
+              console.log("音再生失敗", err);
+            });
 
             // ブラウザ通知
             if (Notification.permission === "granted") {
