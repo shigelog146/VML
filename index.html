@@ -281,27 +281,40 @@
     // モバイル用音解除
     // =========================
     let audioUnlocked = false;
+    let audioContext = null;
+
+    function getAudioContext() {
+      const AudioContextClass =
+        window.AudioContext || window.webkitAudioContext;
+
+      if (!AudioContextClass) return null;
+      if (!audioContext) {
+        audioContext = new AudioContextClass();
+      }
+
+      return audioContext;
+    }
+
+    async function requestBrowserNotificationPermission() {
+      if (!("Notification" in window)) return;
+      if (Notification.permission === "default") {
+        await Notification.requestPermission();
+      }
+    }
 
     // タップ時に音を解放
     async function unlockAudio() {
 
-      if (audioUnlocked) return;
-
       try {
 
-        const audio = new Audio(
-          "https://actions.google.com/sounds/v1/cartoon/pop.ogg"
-        );
+        const context = getAudioContext();
 
-        audio.volume = 0;
+        if (context && context.state === "suspended") {
+          await context.resume();
+        }
 
-        await audio.play();
-
-        audio.pause();
-
-        audio.currentTime = 0;
-
-        audioUnlocked = true;
+        audioUnlocked = !!context && context.state === "running";
+        await requestBrowserNotificationPermission();
 
         console.log("モバイル音解除成功");
 
@@ -310,6 +323,43 @@
         console.log("音解除失敗", err);
 
       }
+    }
+
+    function playNotificationSound(type = "order") {
+      const context = getAudioContext();
+
+      if (!context || context.state !== "running") {
+        unlockAudio();
+        return;
+      }
+
+      const now = context.currentTime;
+      const pattern =
+        type === "cancel"
+          ? [
+            { frequency: 520, start: 0, duration: 0.12 },
+            { frequency: 390, start: 0.16, duration: 0.18 }
+          ]
+          : [
+            { frequency: 880, start: 0, duration: 0.1 },
+            { frequency: 1175, start: 0.14, duration: 0.16 }
+          ];
+
+      pattern.forEach(({ frequency, start, duration }) => {
+        const oscillator = context.createOscillator();
+        const gain = context.createGain();
+
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(frequency, now + start);
+        gain.gain.setValueAtTime(0.0001, now + start);
+        gain.gain.exponentialRampToValueAtTime(0.25, now + start + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + start + duration);
+
+        oscillator.connect(gain);
+        gain.connect(context.destination);
+        oscillator.start(now + start);
+        oscillator.stop(now + start + duration + 0.02);
+      });
     }
 
     // 画面タップで解除
@@ -928,14 +978,7 @@
     購入者：${purchase.buyer_name}
   `;
 
-              // 通知音
-              const audio = new Audio(
-                "https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"
-              );
-
-              audio.play().catch(err => {
-                console.log("音再生失敗", err);
-              });
+              playNotificationSound("order");
 
               // ブラウザ通知
               if (Notification.permission === "granted") {
@@ -971,18 +1014,7 @@
     ❌ 注文がキャンセルされました
   `;
 
-              // =========================
-              // 通知音（鈴）
-              // =========================
-              const audio = new Audio(
-                "https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"
-              );
-
-              audio.volume = 0.5;
-
-              audio.play().catch(err => {
-                console.log("音再生失敗", err);
-              });
+              playNotificationSound("cancel");
 
               // =========================
               // ブラウザ通知
@@ -1033,14 +1065,7 @@
   購入者：${purchase.buyer_name}
 `;
 
-            // 通知音
-            const audio = new Audio(
-              "https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"
-            );
-
-            audio.play().catch(err => {
-              console.log("音再生失敗", err);
-            });
+            playNotificationSound("order");
 
             // ブラウザ通知
             if (Notification.permission === "granted") {
@@ -1059,13 +1084,8 @@
     }
 
     /* =============================
-       ブラウザ通知許可
+       ブラウザ通知許可は初回タップ時に取得
     ============================= */
-    if ("Notification" in window) {
-
-      Notification.requestPermission();
-
-    }
   </script>
 
 </body>
