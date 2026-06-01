@@ -277,7 +277,52 @@
     const loginStatus = document.getElementById("loginStatus");
     const locationBtn = document.getElementById("locationBtn");
     const registerBtn = document.getElementById("registerBtn");
+    // =========================
+    // モバイル用音解除
+    // =========================
+    let audioUnlocked = false;
 
+    // タップ時に音を解放
+    async function unlockAudio() {
+
+      if (audioUnlocked) return;
+
+      try {
+
+        const audio = new Audio(
+          "https://actions.google.com/sounds/v1/cartoon/pop.ogg"
+        );
+
+        audio.volume = 0;
+
+        await audio.play();
+
+        audio.pause();
+
+        audioUnlocked = true;
+
+        console.log("モバイル音解除成功");
+
+      } catch (err) {
+
+        console.log("音解除失敗", err);
+
+      }
+    }
+
+    // 画面タップで解除
+    document.addEventListener(
+      "touchstart",
+      unlockAudio,
+      { once: true }
+    );
+
+    // Android用
+    document.addEventListener(
+      "click",
+      unlockAudio,
+      { once: true }
+    );
     /* =============================
        パスワード表示切替
     ============================= */
@@ -928,7 +973,7 @@
               // 通知音（鈴）
               // =========================
               const audio = new Audio(
-                "https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"
+                "https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"
               );
 
               audio.volume = 0.5;
