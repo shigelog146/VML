@@ -423,7 +423,7 @@
                 return;
             }
 
-            const buyerName = document.getElementById("buyer_name").value;
+            const buyerName = document.getElementById("buyer_name").value.trim();
             const qty = Number(
                 document.getElementById(`qty_${vegetableId}`).value
             );
@@ -443,16 +443,19 @@
             const { data: vegetable, error: vegError } =
                 await supabase
                     .from("vegetables")
-                    .select("*")
+                    .update({ is_available: false })
                     .eq("id", vegetableId)
+                    .eq("is_available", true)
+                    .select("*")
                     .single();
 
             if (vegError || !vegetable) {
 
                 console.error(vegError);
 
-                alert("野菜情報取得失敗");
+                alert("この商品はすでに購入済みです");
 
+                loadVegetables();
                 return;
             }
             /* purchasesテーブルへ保存 */
@@ -475,7 +478,7 @@
 
                     buyer_name: buyerName,
 
-                    farmer_id: farmerId,
+                    farmer_id: vegetable.farmer_id || farmerId,
 
                     farmer_name:
                         vegetable.farmer_name,
@@ -485,15 +488,13 @@
 
             if (error) {
                 console.error(error);
+                await supabase
+                    .from("vegetables")
+                    .update({ is_available: true })
+                    .eq("id", vegetableId);
                 alert("購入記録に失敗しました");
                 return;
             }
-
-            /* 売切れ更新 */
-            await supabase
-                .from("vegetables")
-                .update({ is_available: false })
-                .eq("id", vegetableId);
 
             alert("購入を記録しました");
             loadVegetables();
