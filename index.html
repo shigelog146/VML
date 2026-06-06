@@ -18,7 +18,7 @@
                         background-color: #e4e3e3;
 
                         /* 固定ボタン分 */
-                        padding-top: 90px;
+                        padding-top: 140px;
                 }
 
                 h1 {
@@ -119,6 +119,91 @@
 
                         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
                 }
+
+                #marketBtn {
+
+                        position: fixed;
+
+                        top: 72px;
+
+                        right: 12px;
+
+                        z-index: 9999;
+
+                        width: auto;
+
+                        padding: 12px 18px;
+
+                        margin: 0;
+
+                        background: #6b8e23;
+
+                        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+                }
+
+                /* =========================
+   他農家商品モーダル
+========================= */
+                #marketModal {
+
+                        display: none;
+
+                        position: fixed;
+
+                        top: 0;
+                        left: 0;
+
+                        width: 100%;
+                        height: 100%;
+
+                        background: rgba(0, 0, 0, 0.5);
+
+                        z-index: 10000;
+                }
+
+                #marketContent {
+
+                        position: relative;
+
+                        background: white;
+
+                        width: 90%;
+
+                        max-width: 700px;
+
+                        max-height: 80vh;
+
+                        overflow-y: auto;
+
+                        margin: 50px auto;
+
+                        padding: 20px;
+
+                        border-radius: 10px;
+                }
+
+                .modalCloseBtn {
+
+                        position: fixed;
+
+                        top: 20px;
+
+                        right: 20px;
+
+                        margin: 0;
+
+                        z-index: 10050;
+
+                        background: #c0392b;
+
+                        color: white;
+
+                        padding: 12px 18px;
+
+                        border-radius: 8px;
+
+                        box-shadow: 0 4px 10px rgba(0, 0, 0, .3);
+                }
         </style>
 
         <!-- Leaflet -->
@@ -172,20 +257,9 @@
         <div id="appArea" class="locked">
 
                 <div id="farmer-actions" style="display:none;">
-                        <!-- =========================
-     注文通知
-========================= -->
-                        <div id="orderNotification" style="
-  background:#fff3cd;
-  color:#856404;
-  padding:16px;
-  border-radius:8px;
-  margin-bottom:20px;
-  display:none;
-  font-weight:bold;
-  border:2px solid #ffeeba;
-">
-                                新しい注文があります
+
+                        <div id="orderNotification">
+                                ...
                         </div>
 
                         <button id="listBtn" onclick="location.href='list.html'">
@@ -193,6 +267,10 @@
                         </button>
 
                 </div>
+
+                <button id="marketBtn" style="display:none;">
+                        他の出品を見る
+                </button>
 
                 <h1>本日の野菜を登録</h1>
 
@@ -277,6 +355,8 @@
                 const loginStatus = document.getElementById("loginStatus");
                 const locationBtn = document.getElementById("locationBtn");
                 const registerBtn = document.getElementById("registerBtn");
+                const marketBtn =
+                        document.getElementById("marketBtn");
                 // =========================
                 // モバイル用音解除
                 // =========================
@@ -536,6 +616,9 @@
                         document.getElementById("register-area")
                                 .style.display = "none";
 
+                        document.getElementById("marketBtn")
+                                .style.display = "none";
+
                         // 農家名表示を消す
                         document.getElementById("farmerNameView")
                                 .textContent = "";
@@ -640,6 +723,9 @@
 
                         document.getElementById("register-area")
                                 .style.display = "block";
+
+                        document.getElementById("marketBtn")
+                                .style.display = "inline-block";
 
                         // =========================
                         // ログイン後はログイン欄を隠す
@@ -1102,11 +1188,145 @@
 
                                 .subscribe();
                 }
+                marketBtn.addEventListener("click", async () => {
+
+                        document.getElementById("marketModal")
+                                .style.display = "block";
+
+                        await loadOtherFarmersProducts();
+
+                });
+                document
+                        .getElementById("closeMarketBtn")
+                        .addEventListener("click", () => {
+
+                                document
+                                        .getElementById("marketModal")
+                                        .style.display = "none";
+
+                        });
+                async function loadOtherFarmersProducts() {
+
+                        const marketList =
+                                document.getElementById("marketList");
+
+                        marketList.innerHTML = "読み込み中...";
+
+                        const { data, error } =
+                                await supabase
+                                        .from("vegetables")
+                                        .select("*")
+                                        .eq("is_available", true)
+                                        .neq("farmer_id", currentUser.id);
+
+                        if (error) {
+
+                                console.error(error);
+
+                                marketList.innerHTML =
+                                        "商品の取得に失敗しました";
+
+                                return;
+                        }
+
+                        if (!data || data.length === 0) {
+
+                                marketList.innerHTML =
+                                        "他の農家の商品はありません";
+
+                                return;
+                        }
+
+                        marketList.innerHTML = "";
+
+                        data.forEach(item => {
+
+                                const div =
+                                        document.createElement("div");
+
+                                div.style.border =
+                                        "1px solid #ddd";
+
+                                div.style.borderRadius =
+                                        "10px";
+
+                                div.style.padding =
+                                        "15px";
+
+                                div.style.marginBottom =
+                                        "15px";
+
+                                div.style.background =
+                                        "#fafafa";
+
+                                div.innerHTML = `
+
+        ${item.image_url
+                                                ? `
+                <img
+                        src="${item.image_url}"
+                        style="
+                                width:100%;
+                                max-width:250px;
+                                border-radius:8px;
+                                margin-bottom:10px;
+                        "
+                >
+                `
+                                                : ""
+                                        }
+
+        <h3 style="margin:5px 0;">
+                ${item.vegetable_name}
+        </h3>
+
+        <p>
+                ■農家 ${item.farmer_name || "不明"}
+        </p>
+
+        <p>
+                ■金額 ${item.price}円
+        </p>
+
+        <p>
+                ■単位 ${item.unit || ""}
+        </p>
+
+        <p>
+                ■メモ ${item.comment || ""}
+        </p>
+`;
+
+                                marketList.appendChild(div);
+
+                        });
+
+                }
 
                 /* =============================
                    ブラウザ通知許可は初回タップ時に取得
                 ============================= */
         </script>
+        <!-- =========================
+     他農家商品一覧モーダル
+========================= -->
+        <div id="marketModal">
+
+                <button id="closeMarketBtn" class="modalCloseBtn">
+                        ✕ 閉じる
+                </button>
+
+                <div id="marketContent">
+
+                        <h2>他の農家の商品</h2>
+
+                        <div id="marketList">
+                                ここに商品一覧が表示されます
+                        </div>
+
+                </div>
+
+        </div>
 
 </body>
 
